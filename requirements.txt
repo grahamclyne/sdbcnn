@@ -1,0 +1,8 @@
+pystac_client
+shapely
+rioxarray
+numpy
+xarray
+rasterio
+matplotlib
+tensorflow

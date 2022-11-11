@@ -12,8 +12,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--load_model', '-m', default='sdb_cnn_dropout=0.3_lr=0.0001_bsize=512_0300.ckpt', help='Model file name')
-    parser.add_argument('--xtst', '-x', default='rgbnss_202020202.npy', help='Full sub-images')
-    parser.add_argument('--ytst', '-y', default='depth_202020202.npy', help='Full sub-images')
+    parser.add_argument('--xtst', '-x', default='rgbnss_201901.npy', help='Full sub-images')
+    parser.add_argument('--ytst', '-y', default='depth_201901.npy', help='Full sub-images')
     parser.add_argument('--fdepth', '-fd', default='ponce_depth_aoi1_10m_crct.tif', help='Depth reference file')
     parser.add_argument('--window', '-w', default=9, help='Window size of sub images', type=int)
 

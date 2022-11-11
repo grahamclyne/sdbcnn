@@ -13,8 +13,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
 path = os.path.join(ROOT_DIR, 'data/')
 model_name = 'sdb_cnn_dropout=0.3_lr=0.0001_bsize=512_0300.ckpt'
-fpred = 'depth_pred_202020202_'+model_name+'.npy'
-ftest = 'depth_tst_202020202.npy'
+fpred = 'depth_pred_201901_'+model_name+'.npy'
+ftest = 'depth_tst_201901.npy'
 y_test = np.load(path+ftest)[:,0]
 y_pred = np.load(path+fpred)[:,0]
 
