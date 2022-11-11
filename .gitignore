@@ -1,0 +1,10 @@
+data/
+ckpts/
+*.tiff
+*.tif
+*.png
+*.npy
+.DS_Store
+sdbcnn_env/
+logs/
+__pycache__/

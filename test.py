@@ -2,7 +2,6 @@ import os
 import sys
 import argparse
 import numpy as np
-import tensorflow as tf
 import utils
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -11,8 +10,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--load_model', '-m', default='sdb_cnn_dropout=0.3_lr=0.0001_bsize=512_0300.ckpt', help='Model file name')
-    parser.add_argument('--xtst', '-x', default='rgbnss_tst_190108.npy', help='Testing data')
-    parser.add_argument('--ytst', '-y', default='depth_tst_190108.npy', help='Depth file name')
+    parser.add_argument('--xtst', '-x', default='rgbnss_tst_202020202.npy', help='Testing data')
+    parser.add_argument('--ytst', '-y', default='depth_tst_202020202.npy', help='Depth file name')
 
     args = parser.parse_args()
     print(args)

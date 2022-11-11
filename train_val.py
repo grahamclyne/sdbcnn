@@ -12,8 +12,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--xtrn', '-x', default='rgbnss_trn_190108.npy', help='Training data')
-    parser.add_argument('--ytrn', '-y', default='depth_trn_190108.npy', help='Depth file name')
+    parser.add_argument('--xtrn', '-x', default='rgbnss_trn_202020202.npy', help='Training data')
+    parser.add_argument('--ytrn', '-y', default='depth_trn_202020202.npy', help='Depth file name')
     parser.add_argument('--epochs', '-e', default=300, help='Number of training epochs', type=int)
     parser.add_argument('--bsize', '-b', default=512, help='Batch size', type=int)
     parser.add_argument('--lr', '-lr', default=0.0001, help='Learning rate', type=int)

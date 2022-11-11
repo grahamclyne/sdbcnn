@@ -9,16 +9,18 @@ import tensorflow as tf
 
 def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     elements = fimg.split('_')
-    dt = os.path.basename(elements[2])
-
-    # open file
-    with rasterio.open(folder+fimg) as img:
-        arr_img = img.read()
+    dt = os.path.basename(elements[1] + elements[2])
+    # # open file
+    # with rasterio.open(folder+fimg) as img:
+    #     arr_img = img.read()
     
-    with rasterio.open(folder+fdepth) as depth:
-        arr_depth = depth.read()
+    # with rasterio.open(folder+fdepth) as depth:
+    #     arr_depth = depth.read()
 
+    arr_depth=np.load(fdepth)
+    arr_img = np.load(fimg)
     # img tiling
+    print(arr_img.shape)
     img_stack = moving_window(arr_img, window_size=(window, window), steps=(1, 1), channel=channel)
     np.save(out_folder+'rgbnss_'+dt, img_stack, allow_pickle=True)
     img_stack = moving_window(arr_img, window_size=(window, window), steps=(stride, stride), channel=channel)
@@ -30,17 +32,17 @@ def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     depth_stack = moving_window(arr_depth, window_size=(window, window), steps=(stride, stride), channel=1)
     
     # remove nodata values
-    img_nodata = np.float32(img.nodata)
-    depth_nodata = np.float32(depth.nodata)
-    base = window*window*channel    # 5x5 with RGB have 75 elements inside
-    # count array w/o nodata -> should be equal with base number
-    unique = np.array(np.unique(np.argwhere(img_stack!=img_nodata)[:,0], return_counts=True)).T
-    img_idx = np.argwhere(unique==base)[:,0]    # extract only the indexes
-    img_stack = img_stack[img_idx,:,:,:]
-    depth_stack = depth_stack[img_idx,:]
-    depth_idx = np.nonzero(depth_stack!=depth_nodata)[0]
-    img_stack = img_stack[depth_idx,:,:,:]
-    depth_stack = depth_stack[depth_idx,:]
+    # img_nodata = np.float32(img.nodata)
+    # depth_nodata = np.float32(depth.nodata)
+    # base = window*window*channel    # 5x5 with RGB have 75 elements inside
+    # # count array w/o nodata -> should be equal with base number
+    # unique = np.array(np.unique(np.argwhere(img_stack!=img_nodata)[:,0], return_counts=True)).T
+    # img_idx = np.argwhere(unique==base)[:,0]    # extract only the indexes
+    # img_stack = img_stack[img_idx,:,:,:]
+    # depth_stack = depth_stack[img_idx,:]
+    # depth_idx = np.nonzero(depth_stack!=depth_nodata)[0]
+    # img_stack = img_stack[depth_idx,:,:,:]
+    # depth_stack = depth_stack[depth_idx,:]
     # remove zero depths
     depth_idx = np.nonzero(depth_stack!=0.0)[0]
     img_stack = img_stack[depth_idx,:,:,:]
@@ -84,6 +86,7 @@ def moving_window(arr, window_size, steps, channel):
     outshape = outshape + arr.shape[:-len(steps)] + tuple(window_size)
 
     tiles = np.lib.stride_tricks.as_strided(arr, shape=outshape, strides=strides, writeable=False)
+    print(tiles.shape)
     stack = tiles.reshape(tiles.shape[0]*tiles.shape[1], window_size[0], window_size[1], channel)
 
     if channel == 1:
@@ -105,8 +108,8 @@ def merged_tiles(arr, row, col, window_size):
 
 
 def write_tif(pathin, pathout, fin, fout, arr):
-    with rasterio.open(pathin+fin) as src:
-        profile = src.profile
+    src =  rasterio.open('/Users/gclyne/sdbcnn/raster_reproj.tiff')
+    profile = src.profile
     
     with rasterio.open(pathout+fout+'.tif', 'w', **profile) as dst:
         dst.write(arr, indexes=1)
