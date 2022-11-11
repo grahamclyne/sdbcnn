@@ -10,7 +10,7 @@ import tensorflow as tf
 def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     elements = fimg.split('_')
     # dt = os.path.basename(elements[1])
-    dt=201901
+    dt='201901'
     # # open file
     # with rasterio.open(folder+fimg) as img:
     #     arr_img = img.read()

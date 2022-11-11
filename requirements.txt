@@ -6,3 +6,4 @@ xarray
 rasterio
 matplotlib
 tensorflow
+sklearn

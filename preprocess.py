@@ -40,7 +40,7 @@ mysearch = catalog.search(collections=['sentinel-s2-l2a-cogs'],
 
 resdict = mysearch.get_all_items()
 
-print('using ' + resdict[0])
+print(resdict[0])
 b02 = rioxarray.open_rasterio(resdict[0].assets['B02'].href)
 b03 = rioxarray.open_rasterio(resdict[0].assets['B03'].href)
 b04 = rioxarray.open_rasterio(resdict[0].assets['B04'].href)
