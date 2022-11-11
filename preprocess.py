@@ -13,39 +13,19 @@ parser = ArgumentParser()
 parser.add_argument('--file', type=str)
 args = parser.parse_args()
 # !gdalinfo /Users/gclyne/Downloads/products/GeoTIFF/NONNA10_4440N06430W.tiff
-# https://gis.stackexchange.com/questions/57834/how-to-get-raster-corner-coordinates-using-python-gdal-bindings
 
-from osgeo import gdal 
-src = gdal.Open(f'/home/gclyne/scratch/{args.file}')
-ulx, xres, xskew, uly, yskew, yres  = src.GetGeoTransform()
-lrx = ulx + (src.RasterXSize * xres)
-lry = uly + (src.RasterYSize * yres)
+bathy = rioxarray.open_rasterio(f'/home/gclyne/scratch/{args.file}')
 
-from osgeo import osr
-
-# Setup the source projection - you can also import from epsg, proj4...
-source = osr.SpatialReference()
-source.ImportFromWkt(src.GetProjection())
-
-# The target projection
-target = osr.SpatialReference()
-target.ImportFromEPSG(4326)
-
-# Create the transform - this can be used repeatedly
-transform = osr.CoordinateTransformation(source, target)
-
-# Transform the point. You can also create an ogr geometry and use the more generic `point.Transform()`
-ulat,llon,_ = transform.TransformPoint(ulx, uly)
-llat,rlon,_ = transform.TransformPoint(lrx,lry)
+left_lon,lower_lat,right_lon,upper_lat = bathy.rio.transform_bounds(
+    "+init=epsg:4326"
+)
 
 
 
 
 
 
-
-
-bbox={'lonLower':llon,'latLower':llat,'lonHigher':rlon,'latHigher':ulat}
+bbox={'lonLower':left_lon,'latLower':lower_lat,'lonHigher':right_lon,'latHigher':upper_lat}
 # https://carpentries-incubator.github.io/geospatial-python/aio/index.html
 # https://data.chs-shc.ca/dashboard/map
 # https://stacindex.org/catalogs/earth-search#/Cnz1sryATwWudkxyZekxWx6356v9RmvvCcLLw79uHWJUDvt2?t=2
@@ -74,12 +54,11 @@ b11 = b11.rio.reproject_match(b02)
 b12 = b12.rio.reproject_match(b02)
 
 
-poly = Polygon([[llon,llat],[rlon,llat],[rlon,ulat],[llon,ulat]])
+poly = Polygon([[left_lon,lower_lat],[right_lon,lower_lat],[right_lon,upper_lat],[left_lon,upper_lat]])
 
 projected_poly = gpd.GeoDataFrame(index=[0], crs='epsg:4326', geometry=[poly])
 projected_poly = projected_poly.to_crs(b02.rio.crs)
 
-bathy = rioxarray.open_rasterio(f'/home/gclyne/scratch/{args.file}')
 def process_band(band:xr.DataArray):
     band = band.rio.clip_box(*projected_poly.total_bounds)
     band = band.rio.reproject_match(bathy)

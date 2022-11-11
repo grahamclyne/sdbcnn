@@ -17,8 +17,8 @@ image_number = 'one' #one image, else multi images
 if image_number == 'one':
 	# one image
 	utils.collect_npy_data(DATA_PATH, DATA_PATH,
-				'ponceRGBNSS_S2_190108_aoi1.tif',
-                            	'ponce_depth_aoi1_10m_crct.tif',
+				'img.npy',
+                            	'depth.npy',
                             	window, stride, channel)
 else:
 	# multi images
