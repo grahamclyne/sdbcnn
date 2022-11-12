@@ -11,7 +11,7 @@ from sklearn.metrics import (mean_absolute_error,
 # evaluation overall
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
-path = os.path.join(ROOT_DIR, 'data/')
+path = '/home/gclyne/scratch/data/'
 model_name = 'sdb_cnn_dropout=0.3_lr=0.0001_bsize=512_0300.ckpt'
 fpred = 'depth_pred_201901_'+model_name+'.npy'
 ftest = 'depth_tst_201901.npy'
@@ -67,7 +67,7 @@ plt.savefig(out_dir+'pred_v_ref.png')
 
 # evaluation per depth range
 start = 0.0
-end = -21.0
+end = np.floor(df_eval['test'].min())
 rng = np.arange(start, end, -1.0)
 for i, d in enumerate(rng):
     if rng[i] != rng[-1]:

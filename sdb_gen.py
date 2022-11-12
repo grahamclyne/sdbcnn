@@ -26,7 +26,7 @@ def main():
     dt = os.path.basename(elements[-1]).split('.')[0]
     
     # load data
-    folder_data = os.path.join(BASE_DIR, 'data/')
+    folder_data = '/home/gclyne/scratch/data/'
     rgb_tst = np.load(folder_data+args.xtst)
     depth_tst = np.load(folder_data+args.ytst)
     print('testing images shape: {}'.format(rgb_tst.shape))

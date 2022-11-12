@@ -33,7 +33,7 @@ def main():
     print(args)
     
     # load data
-    folder_data = os.path.join(BASE_DIR, 'data/')
+    folder_data = '/home/gclyne/scratch/data/'
     rgb_trn = np.load(folder_data+args.xtrn)
     depth_trn = np.load(folder_data+args.ytrn)
     print('training images shape: {}'.format(rgb_trn.shape))
@@ -64,7 +64,7 @@ def main():
     tensorBoard = tf.keras.callbacks.TensorBoard(log_dir=folder_ckpt+'logs/',
                                                  histogram_freq=1)
     callbacks = [modelCheckpoint, tensorBoard]
-
+    tf.device('/cpu:0')
     # compile
     model.compile(optimizer = tf.keras.optimizers.Adam(lr = lr),
                   loss = 'mse',

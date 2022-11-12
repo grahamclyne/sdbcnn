@@ -8,13 +8,14 @@ import numpy as np
 import xarray as xr
 from argparse import ArgumentParser
 
+#python preprocess.py --file /Users/gclyne/Downloads/1045100064200_201901_RAW_DEM/1045100064200_201901_RAW_DEM.tif
 
 parser = ArgumentParser()
 parser.add_argument('--file', type=str)
 args = parser.parse_args()
 # !gdalinfo /Users/gclyne/Downloads/products/GeoTIFF/NONNA10_4440N06430W.tiff
 
-bathy = rioxarray.open_rasterio(f'/home/gclyne/scratch/{args.file}')
+bathy = rioxarray.open_rasterio(f'{args.file}')
 
 left_lon,lower_lat,right_lon,upper_lat = bathy.rio.transform_bounds(
     "+init=epsg:4326"
@@ -76,7 +77,7 @@ b12 = process_band(b12)
 sat_s2 = np.concatenate((b02,b03,b04,b08,b11,b12),axis=0)
 
 
-np.save('img',sat_s2,allow_pickle=True)
+np.save('img',sat_s2[:,0:1000,0:1000],allow_pickle=True)
 
 
 #use if memory problems

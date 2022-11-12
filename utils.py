@@ -33,17 +33,17 @@ def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     depth_stack = moving_window(arr_depth, window_size=(window, window), steps=(stride, stride), channel=1)
     
     # remove nodata values
-    # img_nodata = np.float32(img.nodata)
-    # depth_nodata = np.float32(depth.nodata)
-    # base = window*window*channel    # 5x5 with RGB have 75 elements inside
-    # # count array w/o nodata -> should be equal with base number
-    # unique = np.array(np.unique(np.argwhere(img_stack!=img_nodata)[:,0], return_counts=True)).T
-    # img_idx = np.argwhere(unique==base)[:,0]    # extract only the indexes
-    # img_stack = img_stack[img_idx,:,:,:]
-    # depth_stack = depth_stack[img_idx,:]
-    # depth_idx = np.nonzero(depth_stack!=depth_nodata)[0]
-    # img_stack = img_stack[depth_idx,:,:,:]
-    # depth_stack = depth_stack[depth_idx,:]
+    img_nodata = np.nan
+    depth_nodata = np.nan
+    base = window*window*channel    # 5x5 with RGB have 75 elements inside
+    # count array w/o nodata -> should be equal with base number
+    unique = np.array(np.unique(np.argwhere(img_stack!=img_nodata)[:,0], return_counts=True)).T
+    img_idx = np.argwhere(unique==base)[:,0]    # extract only the indexes
+    img_stack = img_stack[img_idx,:,:,:]
+    depth_stack = depth_stack[img_idx,:]
+    depth_idx = np.nonzero(depth_stack!=depth_nodata)[0]
+    img_stack = img_stack[depth_idx,:,:,:]
+    depth_stack = depth_stack[depth_idx,:]
     # remove zero depths
     depth_idx = np.nonzero(depth_stack!=0.0)[0]
     img_stack = img_stack[depth_idx,:,:,:]

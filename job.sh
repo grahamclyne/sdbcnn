@@ -2,7 +2,7 @@
 
 #SBATCH --account=def-dmatthew
 #SBATCH --time=02:00:00
-#SBATCH --mem=50G
+#SBATCH --mem=100G
 #SBATCH --cpus-per-task=32
 
 module load python/3.9 
