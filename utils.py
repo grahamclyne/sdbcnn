@@ -18,8 +18,8 @@ def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     # with rasterio.open(folder+fdepth) as depth:
     #     arr_depth = depth.read()
 
-    arr_depth=np.load(fdepth)
-    arr_img = np.load(fimg)
+    arr_depth=np.load(folder + fdepth)
+    arr_img = np.load(folder + fimg)
     # img tiling
     print(arr_img.shape)
     img_stack = moving_window(arr_img, window_size=(window, window), steps=(1, 1), channel=channel)

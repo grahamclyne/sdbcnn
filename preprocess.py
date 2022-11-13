@@ -36,7 +36,7 @@ catalog = Client.open('https://earth-search.aws.element84.com/v0')
 mysearch = catalog.search(collections=['sentinel-s2-l2a-cogs'],
                           bbox=[bbox['lonLower'],bbox['latLower'],bbox['lonHigher'],bbox['latHigher']],
                            query =  {"eo:cloud_cover":{"lt":1}},
-                          datetime='2019-01-01/2019-02-01', 
+                          datetime='2019-04-01/2019-10-01', 
                           max_items=10)   
 
 resdict = mysearch.get_all_items()
@@ -77,7 +77,7 @@ b12 = process_band(b12)
 sat_s2 = np.concatenate((b02,b03,b04,b08,b11,b12),axis=0)
 
 sat_masked = sat_s2.where(sat_s2 != -99999.) 
-np.save('img_' + file_name,sat_masked,allow_pickle=True)
+np.save('/home/gclyne/scratch/data/img_' + file_name,sat_masked,allow_pickle=True)
 
 
 #use if memory problems
@@ -97,7 +97,7 @@ np.save('img_' + file_name,sat_masked,allow_pickle=True)
 
 
 ds_masked = bathy.where(bathy != -99999.) 
-np.save('depth_' + file_name,ds_masked.values,allow_pickle=True)
+np.save('/home/gclyne/scratch/data/depth_' + file_name,ds_masked.values,allow_pickle=True)
 
 
 # Plot

@@ -12,13 +12,17 @@ DATA_PATH = '/home/gclyne/scratch/data/'
 window = 9
 stride = 3
 channel = 6
-image_number = 'multi' #one image, else multi images
+image_number = 'one' #one image, else multi images
+parser = argparse.ArgumentParser()
+parser.add_argument('--img_file')
+parser.add_argument('--depth_file')
 
+args = parser.parse_args()
 if image_number == 'one':
 	# one image
 	utils.collect_npy_data(DATA_PATH, DATA_PATH,
-				'img.npy',
-                            	'depth.npy',
+				args.img_file,
+                            	args.depth_file,
                             	window, stride, channel)
 else:
 	# multi images
