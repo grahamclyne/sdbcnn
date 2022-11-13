@@ -19,7 +19,7 @@ def main():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
     elements = args.xtst.split('_')
-    dt = os.path.basename(elements[-1]).split('.')[0]
+    dt = elements[-1].split('.')[0]
 
     # load data
     folder_data = '/home/gclyne/scratch/data/'

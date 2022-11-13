@@ -1,5 +1,6 @@
 import os
 import rasterio
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,10 +14,15 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
 path = '/home/gclyne/scratch/data/'
 model_name = 'sdb_cnn_dropout=0.3_lr=0.0001_bsize=512_0300.ckpt'
-fpred = 'depth_pred_201901_'+model_name+'.npy'
-ftest = 'depth_tst_201901.npy'
-y_test = np.load(path+ftest)[:,0]
-y_pred = np.load(path+fpred)[:,0]
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--pred',  default='depth_pred_201901_'+model_name+'.npy', help='Full sub-images')
+parser.add_argument('--tst',  default='depth_tst_201901.npy', help='Full sub-images')
+args = parser.parse_args()
+
+y_test = np.load(path+args.tst)[:,0]
+y_pred = np.load(path+args.pred)[:,0]
 
 df_eval = pd.DataFrame({'test': y_test, 'pred': y_pred, 'diff': np.abs(y_test-y_pred)})
 df_eval = df_eval.loc[(df_eval.test < 0.0) & (df_eval.test >= -20.0)]

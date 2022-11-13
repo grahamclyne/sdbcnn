@@ -22,7 +22,7 @@ left_lon,lower_lat,right_lon,upper_lat = bathy.rio.transform_bounds(
 )
 
 
-
+file_name = args.file.split('/')[-1]
 
 
 
@@ -35,7 +35,7 @@ catalog = Client.open('https://earth-search.aws.element84.com/v0')
 # catalog1 = Client.open('https://earthengine-stac.storage.googleapis.com/catalog/COPERNICUS')
 mysearch = catalog.search(collections=['sentinel-s2-l2a-cogs'],
                           bbox=[bbox['lonLower'],bbox['latLower'],bbox['lonHigher'],bbox['latHigher']],
-                        #   query =  {"eo:cloud_cover":{"lt":1}},
+                           query =  {"eo:cloud_cover":{"lt":1}},
                           datetime='2019-01-01/2019-02-01', 
                           max_items=10)   
 
@@ -63,7 +63,7 @@ projected_poly = projected_poly.to_crs(b02.rio.crs)
 def process_band(band:xr.DataArray):
     band = band.rio.clip_box(*projected_poly.total_bounds)
     band = band.rio.reproject_match(bathy)
-    band = band.rio.interpolate_na()
+    # band = band.rio.interpolate_na() # should i interpolate?
     return band
 
 
@@ -76,8 +76,8 @@ b12 = process_band(b12)
 
 sat_s2 = np.concatenate((b02,b03,b04,b08,b11,b12),axis=0)
 
-
-np.save('img',sat_s2[:,0:1000,0:1000],allow_pickle=True)
+sat_masked = sat_s2.where(sat_s2 != -99999.) 
+np.save('img_' + file_name,sat_masked,allow_pickle=True)
 
 
 #use if memory problems
@@ -97,7 +97,7 @@ np.save('img',sat_s2[:,0:1000,0:1000],allow_pickle=True)
 
 
 ds_masked = bathy.where(bathy != -99999.) 
-np.save('depth',ds_masked.values[:,0:1000,0:1000],allow_pickle=True)
+np.save('depth_' + file_name,ds_masked.values,allow_pickle=True)
 
 
 # Plot

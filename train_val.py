@@ -46,9 +46,13 @@ def main():
     batch_size = args.bsize
     lr = args.lr
     model_name = 'sdb_cnn'+'_dropout='+str(dropout_rate)+'_lr='+str(lr)+'_bsize='+str(batch_size)
-
     # create model
+
     model = utils.sdb_cnn(input_size=size, dropout_rate=dropout_rate)
+    #for multiple files of training
+    if(os.path.exists(folder_ckpt + model_name)):
+        model.load_weights(folder_ckpt+args.load_model)
+  
 
     # call backs
     earlyStopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss',

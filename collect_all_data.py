@@ -12,7 +12,7 @@ DATA_PATH = '/home/gclyne/scratch/data/'
 window = 9
 stride = 3
 channel = 6
-image_number = 'one' #one image, else multi images
+image_number = 'multi' #one image, else multi images
 
 if image_number == 'one':
 	# one image

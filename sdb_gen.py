@@ -45,7 +45,7 @@ def main():
     # open depth reference image
     # with rasterio.open(folder_data+args.fdepth) as depth:
     #     arr_depth = depth.read()
-    arr_depth = np.load('/Users/gclyne/sdbcnn/depth.npy')
+    arr_depth = np.load('/home/gclyne/projects/def-dmatthew/gclyne/sdbcnn/depth.npy')
     row = arr_depth.shape[1]
     col = arr_depth.shape[2]
     

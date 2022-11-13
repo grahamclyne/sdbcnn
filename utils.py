@@ -10,7 +10,7 @@ import tensorflow as tf
 def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     elements = fimg.split('_')
     # dt = os.path.basename(elements[1])
-    dt='201901'
+    dt=elements[1]
     # # open file
     # with rasterio.open(folder+fimg) as img:
     #     arr_img = img.read()
@@ -109,7 +109,7 @@ def merged_tiles(arr, row, col, window_size):
 
 
 def write_tif(pathin, pathout, fin, fout, arr):
-    src =  rasterio.open('/Users/gclyne/sdbcnn/raster_reproj.tiff')
+    src =  rasterio.open('/home/gclyne/scratch/1045100064200_201901_RAW_DEM.tif')
     profile = src.profile
     
     with rasterio.open(pathout+fout+'.tif', 'w', **profile) as dst:
