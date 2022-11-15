@@ -7,23 +7,32 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import (mean_absolute_error,
                              median_absolute_error,
                              r2_score)
-
+import constants
 
 # evaluation overall
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
-path = '/home/gclyne/scratch/data/'
-model_name = 'sdb_cnn_dropout=0.3_lr=0.0001_bsize=512_0300.ckpt'
+path = os.environ['SDBCNN_DATA_PATH']
+model_name = f'sdb_cnn_dropout=0.3_lr=0.0001_bsize={constants.batch_size}_{constants.epochs}.ckpt'
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--pred',  default='depth_pred_201901_'+model_name+'.npy', help='Full sub-images')
 parser.add_argument('--tst',  default='depth_tst_201901.npy', help='Full sub-images')
 args = parser.parse_args()
-
-y_test = np.load(path+args.tst)[:,0]
-y_pred = np.load(path+args.pred)[:,0]
-
+y_pred = np.load(f'{path}{args.pred}')[:,0]
+y_test = np.load(f'{path}{args.tst}')[:,0]
+# for index in range(10):
+#     pred_temp = 
+#     test_temp = 
+#     print(pred_temp.shape,test_temp.shape)
+#     if(len(y_pred) == 0 ): 
+#         y_test = test_temp
+#         y_pred = pred_temp
+#     else:
+#         y_test = np.concatenate([y_test,test_temp],axis=0)
+#         y_pred = np.concatenate([y_pred,pred_temp],axis=0)
+#     print(y_pred.shape,y_test.shape)
 df_eval = pd.DataFrame({'test': y_test, 'pred': y_pred, 'diff': np.abs(y_test-y_pred)})
 df_eval = df_eval.loc[(df_eval.test < 0.0) & (df_eval.test >= -20.0)]
 df_eval = df_eval.dropna()

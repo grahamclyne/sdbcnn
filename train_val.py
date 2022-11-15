@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 import utils
 from datetime import datetime
-
+import constants
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
@@ -14,8 +14,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--xtrn', '-x', default='rgbnss_trn_201901.npy', help='Training data')
     parser.add_argument('--ytrn', '-y', default='depth_trn_201901.npy', help='Depth file name')
-    parser.add_argument('--epochs', '-e', default=300, help='Number of training epochs', type=int)
-    parser.add_argument('--bsize', '-b', default=512, help='Batch size', type=int)
+    parser.add_argument('--epochs', '-e', default=int(constants.epochs), help='Number of training epochs', type=int)
+    parser.add_argument('--bsize', '-b', default=constants.batch_size, help='Batch size', type=int)
     parser.add_argument('--lr', '-lr', default=0.0001, help='Learning rate', type=int)
     parser.add_argument('--log', help='Log to file in save folder; use - for stdout (default is log.txt)', metavar='file', default='log.txt')
 
@@ -33,7 +33,7 @@ def main():
     print(args)
     
     # load data
-    folder_data = '/home/gclyne/scratch/data/'
+    folder_data = os.environ['SDBCNN_DATA_PATH']
     rgb_trn = np.load(folder_data+args.xtrn)
     depth_trn = np.load(folder_data+args.ytrn)
     print('training images shape: {}'.format(rgb_trn.shape))
@@ -47,11 +47,13 @@ def main():
     lr = args.lr
     model_name = 'sdb_cnn'+'_dropout='+str(dropout_rate)+'_lr='+str(lr)+'_bsize='+str(batch_size)
     # create model
-
     model = utils.sdb_cnn(input_size=size, dropout_rate=dropout_rate)
+
     #for multiple files of training
     if(os.path.exists(folder_ckpt + model_name)):
-        model.load_weights(folder_ckpt+args.load_model)
+        print('loading previous model')
+        model.load_weights(folder_ckpt+model_name)
+
   
 
     # call backs
@@ -68,9 +70,8 @@ def main():
     tensorBoard = tf.keras.callbacks.TensorBoard(log_dir=folder_ckpt+'logs/',
                                                  histogram_freq=1)
     callbacks = [modelCheckpoint, tensorBoard]
-    tf.device('/cpu:0')
     # compile
-    model.compile(optimizer = tf.keras.optimizers.Adam(lr = lr),
+    model.compile(optimizer = tf.keras.optimizers.Adam(learning_rate = lr),
                   loss = 'mse',
                   metrics = ['mae', 'mse'])
 

@@ -20,30 +20,29 @@ def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
 
     arr_depth=np.load(folder + fdepth)
     arr_img = np.load(folder + fimg)
-    # img tiling
-    print(arr_img.shape)
-    img_stack = moving_window(arr_img, window_size=(window, window), steps=(1, 1), channel=channel)
-    np.save(out_folder+'rgbnss_'+dt, img_stack, allow_pickle=True)
+    # # img tiling
+    # img_stack = moving_window(arr_img, window_size=(window, window), steps=(1, 1), channel=channel)
+    # np.save(out_folder+'rgbnss_'+dt, img_stack, allow_pickle=True)
     img_stack = moving_window(arr_img, window_size=(window, window), steps=(stride, stride), channel=channel)
 
     # depth tiling
-    depth_stack = moving_window(arr_depth, window_size=(window, window), steps=(1, 1), channel=1)
-    depth_stack = np.float32(depth_stack)
-    np.save(out_folder+'depth_'+dt, depth_stack, allow_pickle=True)
+    # depth_stack = moving_window(arr_depth, window_size=(window, window), steps=(1, 1), channel=1)
+    # depth_stack = np.float32(depth_stack)
+    # np.save(out_folder+'depth_'+dt, depth_stack, allow_pickle=True)
     depth_stack = moving_window(arr_depth, window_size=(window, window), steps=(stride, stride), channel=1)
     
     # remove nodata values
-    img_nodata = np.nan
-    depth_nodata = np.nan
-    base = window*window*channel    # 5x5 with RGB have 75 elements inside
+    # img_nodata = np.nan
+    # depth_nodata = np.nan
+    # base = window*window*channel    # 5x5 with RGB have 75 elements inside
     # count array w/o nodata -> should be equal with base number
-    unique = np.array(np.unique(np.argwhere(img_stack!=img_nodata)[:,0], return_counts=True)).T
-    img_idx = np.argwhere(unique==base)[:,0]    # extract only the indexes
-    img_stack = img_stack[img_idx,:,:,:]
-    depth_stack = depth_stack[img_idx,:]
-    depth_idx = np.nonzero(depth_stack!=depth_nodata)[0]
-    img_stack = img_stack[depth_idx,:,:,:]
-    depth_stack = depth_stack[depth_idx,:]
+    # unique = np.array(np.unique(np.argwhere(img_stack!=img_nodata)[:,0], return_counts=True)).T
+    # img_idx = np.argwhere(unique==base)[:,0]    # extract only the indexes
+    # img_stack = img_stack[img_idx,:,:,:]
+    # depth_stack = depth_stack[img_idx,:]
+    # depth_idx = np.nonzero(depth_stack!=depth_nodata)[0]
+    # img_stack = img_stack[depth_idx,:,:,:]
+    # depth_stack = depth_stack[depth_idx,:]
     # remove zero depths
     depth_idx = np.nonzero(depth_stack!=0.0)[0]
     img_stack = img_stack[depth_idx,:,:,:]
@@ -89,7 +88,7 @@ def moving_window(arr, window_size, steps, channel):
     tiles = np.lib.stride_tricks.as_strided(arr, shape=outshape, strides=strides, writeable=False)
     print(tiles.shape)
     stack = tiles.reshape(tiles.shape[0]*tiles.shape[1], window_size[0], window_size[1], channel)
-
+    print(stack.shape)
     if channel == 1:
         stack = stack[:, 2, 2, :]
     

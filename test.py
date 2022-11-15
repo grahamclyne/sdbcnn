@@ -3,30 +3,29 @@ import sys
 import argparse
 import numpy as np
 import utils
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import constants
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--load_model', '-m', default='sdb_cnn_dropout=0.3_lr=0.0001_bsize=512_0300.ckpt', help='Model file name')
+    parser.add_argument('--load_model', '-m', default=f'sdb_cnn_dropout=0.3_lr=0.0001_bsize={constants.batch_size}_{constants.epochs}.ckpt', help='Model file name')
     parser.add_argument('--xtst', '-x', default='rgbnss_tst_201901.npy', help='Testing data')
     parser.add_argument('--ytst', '-y', default='depth_tst_201901.npy', help='Depth file name')
 
     args = parser.parse_args()
     print(args)
 
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    BASE_DIR = os.environ['SDBCNN_PROJECT_PATH']
 
     elements = args.xtst.split('_')
     dt = elements[-1].split('.')[0]
 
     # load data
-    folder_data = '/home/gclyne/scratch/data/'
+    folder_data = os.environ['SDBCNN_DATA_PATH']
     rgb_tst = np.load(folder_data+args.xtst)
-    depth_tst = np.load(folder_data+args.ytst)
+    # depth_tst = np.load(folder_data+args.ytst)
     print('testing images shape: {}'.format(rgb_tst.shape))
-    print('testing depth shape: {}'.format(depth_tst.shape))
+    # print('testing depth shape: {}'.format(depth_tst.shape))
 
     # load model
     model = utils.sdb_cnn(input_size=(9, 9, 6), dropout_rate=0.3)
@@ -36,10 +35,10 @@ def main():
     # prediction
     depth_pred = model.predict(rgb_tst, verbose=1)
     print('predict depth shape: {}'.format(depth_pred.shape))
-    print('test depth shape: {}'.format(depth_tst.shape))
+    # print('test depth shape: {}'.format(depth_tst.shape))
 
     # save as npy
-    np.save(folder_data+'depth_pred_'+dt+'_'+args.load_model, depth_pred, allow_pickle=True)
+    np.save(folder_data+'depth_pred_'+dt, depth_pred, allow_pickle=True)
 
 
 

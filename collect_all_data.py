@@ -3,11 +3,11 @@ import sys
 import argparse
 import numpy as np
 import utils
-
+import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
-DATA_PATH = '/home/gclyne/scratch/data/'
+DATA_PATH = os.environ['SDBCNN_DATA_PATH']
 
 window = 9
 stride = 3

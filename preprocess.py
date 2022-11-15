@@ -7,9 +7,12 @@ import rioxarray
 import numpy as np
 import xarray as xr
 from argparse import ArgumentParser
+import os 
+import rasterio
 
 #python preprocess.py --file /Users/gclyne/Downloads/1045100064200_201901_RAW_DEM/1045100064200_201901_RAW_DEM.tif
-
+# DATA_PATH = '/home/gclyne/scratch/data'
+DATA_PATH = os.environ['SDBCNN_DATA_PATH']
 parser = ArgumentParser()
 parser.add_argument('--file', type=str)
 args = parser.parse_args()
@@ -17,12 +20,10 @@ args = parser.parse_args()
 
 bathy = rioxarray.open_rasterio(f'{args.file}')
 
-left_lon,lower_lat,right_lon,upper_lat = bathy.rio.transform_bounds(
-    "+init=epsg:4326"
-)
+left_lon,lower_lat,right_lon,upper_lat = bathy.rio.transform_bounds('epsg:4326')
 
 
-file_name = args.file.split('/')[-1]
+file_name = args.file.split('/')[-1].split('_')[0]
 
 
 
@@ -63,7 +64,8 @@ projected_poly = projected_poly.to_crs(b02.rio.crs)
 def process_band(band:xr.DataArray):
     band = band.rio.clip_box(*projected_poly.total_bounds)
     band = band.rio.reproject_match(bathy)
-    # band = band.rio.interpolate_na() # should i interpolate?
+    band = band.where(band != -99999.)
+    band = band.rio.interpolate_na() # should i interpolate?
     return band
 
 
@@ -76,39 +78,36 @@ b12 = process_band(b12)
 
 sat_s2 = np.concatenate((b02,b03,b04,b08,b11,b12),axis=0)
 
-sat_masked = sat_s2.where(sat_s2 != -99999.) 
-np.save('/home/gclyne/scratch/data/img_' + file_name,sat_masked,allow_pickle=True)
 
 
 #use if memory problems
-# def splitArray(array,bound,var):
-#     text_file = open("./data/f" + var + "_list.txt", "w")
+# def splitArray(array,var):
 #     dim1_step = array.shape[1] // 10 
 #     dim2_step = array.shape[2] // 10
 #     for i in range(10):
 #         subset = array[:,((i) * dim1_step):((i+1) * dim1_step),((i) * dim2_step):((i+1) * dim2_step)]
-#         name = var + '_' + resdict[0].id.split('_')[2] + '_' + str(i)
-#         np.save('./data/' + name,subset,allow_pickle=True)
-#         text_file.write('./data/' + name + '.npy\n')
-#     text_file.close()
-
-# splitArray(sat_s2,max(sat_s2.shape),'img')
-# splitArray(bathy,max(bathy.shape),'depth')
-
+#         name = var + '_' + file_name + ':' + str(i)
+#         np.save(DATA_PATH + '/' + name,subset,allow_pickle=True)
 
 ds_masked = bathy.where(bathy != -99999.) 
-np.save('/home/gclyne/scratch/data/depth_' + file_name,ds_masked.values,allow_pickle=True)
+
+# splitArray(sat_s2,'img')
+# splitArray(ds_masked,'depth')
+
+
+np.save(DATA_PATH + 'depth_' + file_name,ds_masked,allow_pickle=True)
+np.save(DATA_PATH + 'img_' + file_name,sat_s2,allow_pickle=True)
 
 
 # Plot
-# fig, ax = plt.subplots()
-# fig.set_size_inches((8,8))
+fig, ax = plt.subplots()
+fig.set_size_inches((8,8))
 
-# # Plot image
-# overview.plot.imshow(ax=ax)
+# Plot image
+overview.plot.imshow(ax=ax)
 
-# # Plot crop fields
-# projected_poly.plot(
-#     ax=ax,
-#     edgecolor="red",
-# )
+# Plot crop fields
+projected_poly.plot(
+    ax=ax,
+    edgecolor="red",
+)
