@@ -12,8 +12,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--xtrn', '-x', default='rgbnss_trn_201901.npy', help='Training data')
-    parser.add_argument('--ytrn', '-y', default='depth_trn_201901.npy', help='Depth file name')
+    parser.add_argument('--xtrn', '-x', default='img_training_total.npy', help='Training data')
+    parser.add_argument('--ytrn', '-y', default='depth_training_total.npy', help='Depth file name')
     parser.add_argument('--epochs', '-e', default=int(constants.epochs), help='Number of training epochs', type=int)
     parser.add_argument('--bsize', '-b', default=constants.batch_size, help='Batch size', type=int)
     parser.add_argument('--lr', '-lr', default=0.0001, help='Learning rate', type=int)
@@ -26,12 +26,12 @@ def main():
     folder_ckpt = os.path.join(BASE_DIR, 'ckpts/')
     if not os.path.exists(folder_ckpt):
         os.makedirs(folder_ckpt)
-    
+
     if args.log != '-':
         sys.stdout = open(os.path.join(folder_ckpt, args.log), 'w')
-    
+
     print(args)
-    
+
     # load data
     folder_data = os.environ['SDBCNN_DATA_PATH']
     rgb_trn = np.load(folder_data+args.xtrn)
@@ -50,11 +50,10 @@ def main():
     model = utils.sdb_cnn(input_size=size, dropout_rate=dropout_rate)
 
     #for multiple files of training
-    if(os.path.exists(folder_ckpt + model_name)):
+    if(os.path.exists(os.environ['SDBCNN_PROJECT_PATH'] + 'sdbcnn.model')):
         print('loading previous model')
-        model.load_weights(folder_ckpt+model_name)
+        model = tf.keras.models.load_model('sdbcnn.model')
 
-  
 
     # call backs
     earlyStopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss',
@@ -77,7 +76,7 @@ def main():
 
     # show the model architecture
     model.summary()
-
+    model.save('sdbcnn.model')
     # fit the compiled model to some training data
     start_time = time.time()
     r = model.fit(x=rgb_trn, y=depth_trn,

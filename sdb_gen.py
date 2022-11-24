@@ -5,15 +5,15 @@ import numpy as np
 import rasterio
 import matplotlib.pyplot as plt
 import utils
-
+import constants
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--load_model', '-m', default='sdb_cnn_dropout=0.3_lr=0.0001_bsize=512_0300.ckpt', help='Model file name')
-    parser.add_argument('--xtst', '-x', default='rgbnss_201901.npy', help='Full sub-images')
-    parser.add_argument('--ytst', '-y', default='depth_201901.npy', help='Full sub-images')
+    parser.add_argument('--load_model', '-m', default=f'sdb_cnn_dropout=0.3_lr=0.0001_bsize={constants.batch_size}_{constants.epochs}.ckpt', help='Model file name')
+    parser.add_argument('--xtst', '-x', default='rgbnss_1045100064200.npy', help='Full sub-images')
+    parser.add_argument('--ytst', '-y', default='depth_tst_1045100064200.npy', help='Full sub-images')
     parser.add_argument('--fdepth', '-fd', default='ponce_depth_aoi1_10m_crct.tif', help='Depth reference file')
     parser.add_argument('--window', '-w', default=9, help='Window size of sub images', type=int)
 
@@ -26,7 +26,7 @@ def main():
     dt = os.path.basename(elements[-1]).split('.')[0]
     
     # load data
-    folder_data = '/home/gclyne/scratch/data/'
+    folder_data = os.environ['SDBCNN_DATA_PATH']
     rgb_tst = np.load(folder_data+args.xtst)
     depth_tst = np.load(folder_data+args.ytst)
     print('testing images shape: {}'.format(rgb_tst.shape))
@@ -45,7 +45,8 @@ def main():
     # open depth reference image
     # with rasterio.open(folder_data+args.fdepth) as depth:
     #     arr_depth = depth.read()
-    arr_depth = np.load('/home/gclyne/projects/def-dmatthew/gclyne/sdbcnn/depth.npy')
+    arr_depth = np.load(os.environ['SDBCNN_DATA_PATH'] + '/depth_1045100064200.npy')
+    print(arr_depth.shape)
     row = arr_depth.shape[1]
     col = arr_depth.shape[2]
     

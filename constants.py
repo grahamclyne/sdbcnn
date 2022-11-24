@@ -1,2 +1,2 @@
-batch_size=128
-epochs='0050'
+batch_size=512
+epochs='0100'

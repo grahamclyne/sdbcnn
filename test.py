@@ -9,8 +9,8 @@ import constants
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--load_model', '-m', default=f'sdb_cnn_dropout=0.3_lr=0.0001_bsize={constants.batch_size}_{constants.epochs}.ckpt', help='Model file name')
-    parser.add_argument('--xtst', '-x', default='rgbnss_tst_201901.npy', help='Testing data')
-    parser.add_argument('--ytst', '-y', default='depth_tst_201901.npy', help='Depth file name')
+    parser.add_argument('--xtst', '-x', default='img_test_total.npy', help='Testing data')
+    parser.add_argument('--ytst', '-y', default='depth_test_total.npy', help='Depth file name')
 
     args = parser.parse_args()
     print(args)

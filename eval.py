@@ -17,14 +17,17 @@ model_name = f'sdb_cnn_dropout=0.3_lr=0.0001_bsize={constants.batch_size}_{const
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--pred',  default='depth_pred_201901_'+model_name+'.npy', help='Full sub-images')
-parser.add_argument('--tst',  default='depth_tst_201901.npy', help='Full sub-images')
+parser.add_argument('--pred',  default='./data/depth_pred_total.npy', help='Full sub-images')
+parser.add_argument('--tst',  default='./data/depth_test_total.npy', help='Full sub-images')
+# parser.add_argument('--files',  type=str)
 args = parser.parse_args()
-y_pred = np.load(f'{path}{args.pred}')[:,0]
-y_test = np.load(f'{path}{args.tst}')[:,0]
-# for index in range(10):
-#     pred_temp = 
-#     test_temp = 
+# files = args.files.split(',')
+y_test = np.load(args.tst)[:,0]
+y_pred = np.load(args.pred)[:,0]
+# for file in files:
+#     if(os.path.exists(f'{path}depth_pred_{file}.npy') and os.path.exists(f'{path}depth_tst_{file}.tiff.npy')):
+#         pred_temp = np.load(f'{path}depth_pred_{file}.npy')[:,0]
+#         test_temp = np.load(f'{path}depth_tst_{file}.tiff.npy')[:,0]
 #     print(pred_temp.shape,test_temp.shape)
 #     if(len(y_pred) == 0 ): 
 #         y_test = test_temp
@@ -35,11 +38,12 @@ y_test = np.load(f'{path}{args.tst}')[:,0]
 #     print(y_pred.shape,y_test.shape)
 df_eval = pd.DataFrame({'test': y_test, 'pred': y_pred, 'diff': np.abs(y_test-y_pred)})
 df_eval = df_eval.loc[(df_eval.test < 0.0) & (df_eval.test >= -20.0)]
+print(df_eval.pred.min())
 df_eval = df_eval.dropna()
 rmse = np.sqrt((df_eval['diff']**2).mean())
 mae = mean_absolute_error(df_eval['test'], df_eval['pred'])
 medAE = median_absolute_error(df_eval['test'], df_eval['pred'])
-r2 = r2_score(df_eval['pred'], df_eval['test'])
+r2 = r2_score(df_eval['test'], df_eval['pred'])
 mini = df_eval['diff'].min()
 maxi = df_eval['diff'].max()
 print(f'rmse: {rmse:.2f}, mae: {mae:.2f}, r2: {r2:.2f}')

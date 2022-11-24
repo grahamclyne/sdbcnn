@@ -6,7 +6,6 @@ import rasterio
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-
 def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     elements = fimg.split('_')
     # dt = os.path.basename(elements[1])
@@ -21,19 +20,19 @@ def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     arr_depth=np.load(folder + fdepth)
     arr_img = np.load(folder + fimg)
     # # img tiling
-    # img_stack = moving_window(arr_img, window_size=(window, window), steps=(1, 1), channel=channel)
-    # np.save(out_folder+'rgbnss_'+dt, img_stack, allow_pickle=True)
+    img_stack = moving_window(arr_img, window_size=(window, window), steps=(1, 1), channel=channel)
+    np.save(out_folder+'rgbnss_'+dt, img_stack, allow_pickle=True)
     img_stack = moving_window(arr_img, window_size=(window, window), steps=(stride, stride), channel=channel)
 
     # depth tiling
-    # depth_stack = moving_window(arr_depth, window_size=(window, window), steps=(1, 1), channel=1)
-    # depth_stack = np.float32(depth_stack)
-    # np.save(out_folder+'depth_'+dt, depth_stack, allow_pickle=True)
+    depth_stack = moving_window(arr_depth, window_size=(window, window), steps=(1, 1), channel=1)
+    depth_stack = np.float32(depth_stack)
+    np.save(out_folder+'depth_ref_'+dt, depth_stack, allow_pickle=True)
     depth_stack = moving_window(arr_depth, window_size=(window, window), steps=(stride, stride), channel=1)
     
     # remove nodata values
-    # img_nodata = np.nan
-    # depth_nodata = np.nan
+    # img_nodata = -99999
+    # depth_nodata = -99999
     # base = window*window*channel    # 5x5 with RGB have 75 elements inside
     # count array w/o nodata -> should be equal with base number
     # unique = np.array(np.unique(np.argwhere(img_stack!=img_nodata)[:,0], return_counts=True)).T
@@ -51,6 +50,10 @@ def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     depth_idx = np.nonzero(depth_stack<2.0)[0]
     img_stack = img_stack[depth_idx,:,:,:]
     depth_stack = depth_stack[depth_idx,:]
+    #remove depths less than -20
+    depth_idx = np.nonzero(depth_stack>-20.0)[0]
+    img_stack = img_stack[depth_idx,:,:,:]
+    depth_stack = depth_stack[depth_idx,:]
 
     # split into training and testing sets
     n = depth_stack.shape[0]
@@ -59,7 +62,8 @@ def collect_npy_data(folder, out_folder, fimg, fdepth, window, stride, channel):
     trn_idx = list(set(range(n)) - set(tst_idx))
     img_trn, img_tst = img_stack[trn_idx,:,:,:], img_stack[tst_idx,:,:,:]
     depth_trn, depth_tst = depth_stack[trn_idx,:], depth_stack[tst_idx,:]
-
+    print('img train shape',img_trn.shape)
+    print('depth train shape',depth_trn.shape)
     # save as npy
     np.save(out_folder+'rgbnss_trn_'+dt, img_trn, allow_pickle=True)
     np.save(out_folder+'rgbnss_tst_'+dt, img_tst, allow_pickle=True)
@@ -86,9 +90,7 @@ def moving_window(arr, window_size, steps, channel):
     outshape = outshape + arr.shape[:-len(steps)] + tuple(window_size)
 
     tiles = np.lib.stride_tricks.as_strided(arr, shape=outshape, strides=strides, writeable=False)
-    print(tiles.shape)
     stack = tiles.reshape(tiles.shape[0]*tiles.shape[1], window_size[0], window_size[1], channel)
-    print(stack.shape)
     if channel == 1:
         stack = stack[:, 2, 2, :]
     
@@ -108,7 +110,7 @@ def merged_tiles(arr, row, col, window_size):
 
 
 def write_tif(pathin, pathout, fin, fout, arr):
-    src =  rasterio.open('/home/gclyne/scratch/1045100064200_201901_RAW_DEM.tif')
+    src =  rasterio.open(os.environ['SDBCNN_PROJECT_PATH'] + 'master.tiff')
     profile = src.profile
     
     with rasterio.open(pathout+fout+'.tif', 'w', **profile) as dst:
